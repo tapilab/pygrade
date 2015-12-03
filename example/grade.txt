@@ -1,0 +1,18 @@
+Grade: 4.00/5.00
+
+1 Deduction(s):
+
+--------------
+#1: 1.00 points
+Failing test: test_hard:  @points=1 
+Traceback (most recent call last):
+  File "test_assignment1.py", line 31, in test_hard
+    self.assertTrue(is_mammal('dolphin'))
+AssertionError: False is not true
+
+source:
+    def test_hard(self):
+         """ @points=1 """
+         self.assertTrue(is_mammal('dolphin'))
+--------------
+
