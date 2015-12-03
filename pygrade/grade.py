@@ -66,7 +66,7 @@ def deduct_failures(test_results):
         msg = failure[1]
         match = re.search(r'\@points\s*=\s*([0-9\.]+)', failure[0]._testMethodDoc)
         points = float(match.group(1)) if match else 0
-        source = '\n'.join(inspect.getsourcelines(getattr(failure[0], failure[0]._testMethodName))[0])
+        source = ' '.join(inspect.getsourcelines(getattr(failure[0], failure[0]._testMethodName))[0])
         deduction = {'summary': '%s%s' % (failure[0]._testMethodName,
                                           ': ' + failure[0]._testMethodDoc
                                           if failure[0]._testMethodDoc else ''),
