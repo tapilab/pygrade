@@ -3,6 +3,13 @@
 
 language: python
 
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5
+
 env:
   - TOXENV=py35
   - TOXENV=py34
