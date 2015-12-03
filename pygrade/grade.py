@@ -17,12 +17,12 @@ from docopt import docopt
 import errno
 import git
 import importlib
+import json
 import os
 import re
 import time
+import traceback
 import unittest
-
-from . import __version__
 
 
 def get_local_repo(s, path):
@@ -39,6 +39,11 @@ def clone_repos(students, path):
 
 
 def read_assignment_metadata(test_file):
+    """
+    Extracts metadata in the comments of the unit test file. E.g.:
+    @name=a0/boolean_search.py
+    @points=50
+    """
     result = {'file_to_test': None,
               'points': None}
 
@@ -48,7 +53,7 @@ def read_assignment_metadata(test_file):
              result['file_to_test'] = match.group(1)
         match = re.search(r'\@points\s*=\s*([0-9\.]+)', line)
         if match:
-            result['points'] = match.group(1)
+            result['points'] = float(match.group(1))
     return result
 
 
@@ -74,20 +79,31 @@ def run_tests(students, test_path, path):
         try:
             assignment_module = import_file_as_module(assignment_path)
         except Exception as e:
-            print('cannot find assignment file %s' % assignment_path)
-            result['deductions'] = [('cannot import %s' % assignment_path, metadata['points'])]
+            result['deductions'] = [{'summary': 'cannot import %s' % assignment_subpath,
+                                     'trace': str(e),
+                                     'points': metadata['points']}]
+            result['grade'] = 0
             results.append(result)
             continue
-        print('assignment module: %s' % str(assignment_module))
         test_module = import_file_as_module(test_path)
-        print('test module: %s' % (str(test_module)))
         suite = unittest.TestLoader().loadTestsFromModule(test_module)
         test_results = unittest.TestCase().defaultTestResult()
         test_results = suite.run(test_results)
-        print(test_results)
-        print(dir(test_results))
+        # print(test_results)
+        deductions = []
         for failure in test_results.failures:
-            print('failure: %s\n%s' % (failure[1], dir(failure[0])))
+            msg = failure[1]
+            match = re.search(r'\: ([0-9\.]+)\s*$', msg)
+            points = float(match.group(1)) if match else 0
+            deduction = {'summary': '%s%s' % (failure[0]._testMethodName,
+                                              ': ' + failure[0]._testMethodDoc
+                                              if failure[0]._testMethodDoc else ''),
+                         'trace': msg,
+                         'points': points}
+            deductions.append(deduction)
+        result['deductions'] = deductions
+        result['grade'] = max(0, metadata['points'] - sum(d['points'] for d in deductions))
+        results.append(result)
     return results
 
 def report_results():
@@ -128,7 +144,8 @@ def main():
     check_students(students)
     clone_repos(students, path)
     results = run_tests(students, args['--test'], path)
-    print(results)
+    json.dump(results, open(args['--output'], 'w'), sort_keys=True, indent=2)
+
 
 if __name__ == '__main__':
     main()
