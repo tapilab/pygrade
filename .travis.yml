@@ -27,5 +27,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: aronwc/pygrade
+    repo: tapilab/pygrade
     condition: $TOXENV == py27
