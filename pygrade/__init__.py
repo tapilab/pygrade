@@ -30,7 +30,7 @@ def read_students(path):
 def path2name(path):
     """ Get the basename of a file, minus any extensions.
     >>> path2name('foo/bar/baz.py')
-    'bazz'
+    'baz'
     """
     return re.sub(r'\..+', '', os.path.basename(path))
 
