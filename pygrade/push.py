@@ -56,7 +56,7 @@ def main():
     args = docopt(__doc__)
     path = mktmpdir(args['--workdir'])
     print('working directory=%s' % path)
-    grades = json.load(open(args['--grades']))
+    grades = [json.loads(s) for s in open(args['--grades'])]
     print('pushing %d grades' % (len(grades)))
     students = [g['student'] for g in grades]
     clone_repos(students, path)

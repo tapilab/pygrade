@@ -15,6 +15,7 @@ Options
 import csv
 from docopt import docopt
 import importlib
+import inspect
 import json
 import os
 import re
@@ -28,18 +29,18 @@ def read_assignment_metadata(test_file):
     """
     Extracts metadata in the comments of the unit test file. E.g.:
     @name=a0/boolean_search.py
-    @points=50
+    @possible_points=50
     """
     result = {'file_to_test': None,
-              'points': None}
+              'possible_points': None}
 
     for line in open(test_file):
         match = re.search(r'\@name\s*=\s*(.+.py)', line)
         if match:
              result['file_to_test'] = match.group(1)
-        match = re.search(r'\@points\s*=\s*([0-9\.]+)', line)
+        match = re.search(r'\@possible_points\s*=\s*([0-9\.]+)', line)
         if match:
-            result['points'] = float(match.group(1))
+            result['possible_points'] = float(match.group(1))
     return result
 
 
@@ -63,12 +64,13 @@ def deduct_failures(test_results):
     deductions = []
     for failure in test_results.failures:
         msg = failure[1]
-        match = re.search(r'\: ([0-9\.]+)\s*$', msg)
+        match = re.search(r'\@points\s*=\s*([0-9\.]+)', failure[0]._testMethodDoc)
         points = float(match.group(1)) if match else 0
+        source = '\n'.join(inspect.getsourcelines(getattr(failure[0], failure[0]._testMethodName))[0])
         deduction = {'summary': '%s%s' % (failure[0]._testMethodName,
                                           ': ' + failure[0]._testMethodDoc
                                           if failure[0]._testMethodDoc else ''),
-                     'trace': msg,
+                     'trace': '%s\nsource:\n%s' % (msg, source),
                      'points': points}
         deductions.append(deduction)
     return deductions
@@ -86,7 +88,7 @@ def run_tests(students, test_path, path):
     for s in students:
         result = {'student': s, 'assignment': assignment_subpath,
                   'time_graded': time.asctime(),
-                  'possible_points': metadata['points']}
+                  'possible_points': metadata['possible_points']}
         repo = get_local_repo(s, path)
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
@@ -94,16 +96,22 @@ def run_tests(students, test_path, path):
         except Exception as e:  # Can't load the student's homework file.
             result['deductions'] = [{'summary': 'cannot import %s' % assignment_subpath,
                                      'trace': str(e),
-                                     'points': metadata['points']}]
+                                     'points': metadata['possible_points']}]
             result['grade'] = 0
             results.append(result)
             continue
         test_results = _run_tests(test_path)
         result['deductions'] = deduct_failures(test_results)
-        result['grade'] = max(0, metadata['points'] - sum(d['points'] for d in result['deductions']))
+        result['grade'] = max(0, metadata['possible_points'] - sum(d['points'] for d in result['deductions']))
         results.append(result)
     return results
 
+def write_grades(grades, out_path):
+    outf = open(out_path, 'w')
+    for g in grades:
+        outf.write(json.dumps(g) + '\n')
+    outf.close()
+    print('saved results in %s' % out_path)
 
 def main():
     args = docopt(__doc__)
@@ -113,8 +121,8 @@ def main():
     print('read %d students' % len(students))
     clone_repos(students, path)
     results = run_tests(students, args['--test'], path)
-    json.dump(results, open(args['--output'], 'w'), sort_keys=True, ensure_ascii=False, indent=2)
-    print('saved results in %s' % args['--output'])
+    write_grades(results, args['--output'])
+
 
 if __name__ == '__main__':
     main()
