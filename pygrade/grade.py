@@ -3,39 +3,25 @@
 """Grade a Python assignment.
 
 usage:
-    pygrade grade --students <file> --test <file> --output <file> [--workdir <file>]
+    pygrade grade --students <file> --test <file> [--output <file>] [--workdir <file>]
 
 Options
     -h, --help
     -s, --students <file>           Students JSON file
     -t, --test <file>               File containing python tests for grading
-    -o, --output <file>             Output file
+    -o, --output <file>             Output file [default: grades.json]
     -w, --workdir <file>            Temporary directory for storing assignments [default: /tmp/pygrade]
 """
 import csv
 from docopt import docopt
-import errno
-import git
 import importlib
 import json
 import os
 import re
 import time
-import traceback
 import unittest
 
-
-def get_local_repo(s, path):
-    return os.path.join(path, os.path.basename(s['github_repo']))
-
-
-def clone_repos(students, path):
-    """ Clone all student repos. """
-    for s in students:
-        repo = s['github_repo']
-        topath = get_local_repo(s, path)
-        print('cloning %s to %s ...' % (repo, topath))
-        git.repo.base.Repo.clone_from(repo + '.git', topath)
+from . import clone_repos, get_local_repo, path2name, mktmpdir
 
 
 def read_assignment_metadata(test_file):
@@ -57,18 +43,43 @@ def read_assignment_metadata(test_file):
     return result
 
 
-def path2name(path):
-    return re.sub(r'\..+', '', os.path.basename(path))
-
-
 def import_file_as_module(path):
+    """ Return a python file as a module. """
     module_name = path2name(path)
-    print('importing %s from %s' % (module_name, path))
     loader = importlib.machinery.SourceFileLoader(module_name, path)
     return loader.load_module()
 
 
+def _run_tests(test_path):
+    """ Run the unit tests in this file and return the results. """
+    test_module = import_file_as_module(test_path)
+    suite = unittest.TestLoader().loadTestsFromModule(test_module)
+    test_results = unittest.TestCase().defaultTestResult()
+    return suite.run(test_results)
+
+
+def deduct_failures(test_results):
+    """ Accumulate each failed tests and the points lost."""
+    deductions = []
+    for failure in test_results.failures:
+        msg = failure[1]
+        match = re.search(r'\: ([0-9\.]+)\s*$', msg)
+        points = float(match.group(1)) if match else 0
+        deduction = {'summary': '%s%s' % (failure[0]._testMethodName,
+                                          ': ' + failure[0]._testMethodDoc
+                                          if failure[0]._testMethodDoc else ''),
+                     'trace': msg,
+                     'points': points}
+        deductions.append(deduction)
+    return deductions
+
+
 def run_tests(students, test_path, path):
+    """
+    Run unit tests and deduct points for each failed test.
+    Return a dictionary of results for each student.
+    FIXME: check for errors?
+    """
     metadata = read_assignment_metadata(test_path)
     assignment_subpath = metadata['file_to_test']
     results = []
@@ -78,48 +89,18 @@ def run_tests(students, test_path, path):
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
             assignment_module = import_file_as_module(assignment_path)
-        except Exception as e:
+        except Exception as e:  # Can't load the student's homework file.
             result['deductions'] = [{'summary': 'cannot import %s' % assignment_subpath,
                                      'trace': str(e),
                                      'points': metadata['points']}]
             result['grade'] = 0
             results.append(result)
             continue
-        test_module = import_file_as_module(test_path)
-        suite = unittest.TestLoader().loadTestsFromModule(test_module)
-        test_results = unittest.TestCase().defaultTestResult()
-        test_results = suite.run(test_results)
-        # print(test_results)
-        deductions = []
-        for failure in test_results.failures:
-            msg = failure[1]
-            match = re.search(r'\: ([0-9\.]+)\s*$', msg)
-            points = float(match.group(1)) if match else 0
-            deduction = {'summary': '%s%s' % (failure[0]._testMethodName,
-                                              ': ' + failure[0]._testMethodDoc
-                                              if failure[0]._testMethodDoc else ''),
-                         'trace': msg,
-                         'points': points}
-            deductions.append(deduction)
-        result['deductions'] = deductions
-        result['grade'] = max(0, metadata['points'] - sum(d['points'] for d in deductions))
+        test_results = _run_tests(test_path)
+        result['deductions'] = deduct_failures(test_results)
+        result['grade'] = max(0, metadata['points'] - sum(d['points'] for d in result['deductions']))
         results.append(result)
     return results
-
-def report_results():
-    pass
-
-
-def mktmpdir(subdir):
-    """ Make a unique, temporary directory for student repos. """
-    path = '%s-%d' % (subdir, time.time())
-    try:
-        os.makedirs(path)
-    except OSError as e:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else: raise
-    return path
 
 
 def read_students(path):
@@ -145,7 +126,7 @@ def main():
     clone_repos(students, path)
     results = run_tests(students, args['--test'], path)
     json.dump(results, open(args['--output'], 'w'), sort_keys=True, indent=2)
-
+    print('saved results in %s' % args['--output'])
 
 if __name__ == '__main__':
     main()
