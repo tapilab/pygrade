@@ -13,7 +13,6 @@ Options
 """
 from docopt import docopt
 from git import Repo
-import importlib
 import json
 import os
 import re
