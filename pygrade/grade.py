@@ -25,6 +25,22 @@ import unittest
 from . import clone_repos, get_local_repo, path2name, mktmpdir, read_students
 
 
+def extract_metadata(text, result):
+    """
+    >>> extract_metadata('@name=a0/foo.py...', {})['file_to_test']
+    'a0/foo.py'
+    >>> extract_metadata('@possible_points=12.4', {})['possible_points']
+    12.4
+    """
+    match = re.search(r'\@name\s*=\s*(.+.py)', text)
+    if match:
+        result['file_to_test'] = match.group(1)
+    match = re.search(r'\@possible_points\s*=\s*([0-9\.]+)', text)
+    if match:
+        result['possible_points'] = float(match.group(1))
+    return result
+
+
 def read_assignment_metadata(test_file):
     """
     Extracts metadata in the comments of the unit test file. E.g.:
@@ -35,12 +51,7 @@ def read_assignment_metadata(test_file):
               'possible_points': None}
 
     for line in open(test_file):
-        match = re.search(r'\@name\s*=\s*(.+.py)', line)
-        if match:
-             result['file_to_test'] = match.group(1)
-        match = re.search(r'\@possible_points\s*=\s*([0-9\.]+)', line)
-        if match:
-            result['possible_points'] = float(match.group(1))
+        extract_metadata(line, result)
     return result
 
 

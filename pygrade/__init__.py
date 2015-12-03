@@ -13,7 +13,7 @@ import time
 import traceback
 
 def check_students(students):
-    """ Make sure we have requisite fields for each student."""
+    """ Make sure we have requisite fields for each student. """
     for s in students:
         if 'github_repo' not in s:
             print('missing github_repo for %s' % str(s))
@@ -28,7 +28,10 @@ def read_students(path):
 
 
 def path2name(path):
-    """ Get the basename of a file, minus any extensions. """
+    """ Get the basename of a file, minus any extensions.
+    >>> path2name('foo/bar/baz.py')
+    'bazz'
+    """
     return re.sub(r'\..+', '', os.path.basename(path))
 
 

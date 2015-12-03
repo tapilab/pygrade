@@ -49,7 +49,7 @@ lint:
 	flake8 pygrade tests
 
 test:
-	python setup.py test
+	nosetests --with-doctest
 
 test-all:
 	tox
