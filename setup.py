@@ -17,11 +17,13 @@ with open('HISTORY.rst') as history_file:
 requirements = [
     # TODO: put package requirements here
     'docopt',
-    'gitpython'
+    'gitpython',
+    'nose'
 ]
 
 test_requirements = [
     # TODO: put package test requirements here
+    'nose'
 ]
 
 setup(
