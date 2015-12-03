@@ -21,7 +21,7 @@ import re
 import time
 import unittest
 
-from . import clone_repos, get_local_repo, path2name, mktmpdir
+from . import clone_repos, get_local_repo, path2name, mktmpdir, read_students
 
 
 def read_assignment_metadata(test_file):
@@ -84,7 +84,9 @@ def run_tests(students, test_path, path):
     assignment_subpath = metadata['file_to_test']
     results = []
     for s in students:
-        result = {'student': s, 'assignment': assignment_subpath, 'time_graded': time.asctime()}
+        result = {'student': s, 'assignment': assignment_subpath,
+                  'time_graded': time.asctime(),
+                  'possible_points': metadata['points']}
         repo = get_local_repo(s, path)
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
@@ -103,29 +105,15 @@ def run_tests(students, test_path, path):
     return results
 
 
-def read_students(path):
-    """ Read a tab-separated file of students. The only required field is 'github_repo', which is this
-    student's github repository. """
-    return [line for line in csv.DictReader(open(path), delimiter='\t')]
-
-
-def check_students(students):
-    """ Make sure we have requisite fields for each student."""
-    for s in students:
-        if 'github_repo' not in s:
-            print('missing github_repo for %s' % str(s))
-
-
 def main():
     args = docopt(__doc__)
     path = mktmpdir(args['--workdir'])
     print('working directory=%s' % path)
     students = read_students(args['--students'])
     print('read %d students' % len(students))
-    check_students(students)
     clone_repos(students, path)
     results = run_tests(students, args['--test'], path)
-    json.dump(results, open(args['--output'], 'w'), sort_keys=True, indent=2)
+    json.dump(results, open(args['--output'], 'w'), sort_keys=True, ensure_ascii=False, indent=2)
     print('saved results in %s' % args['--output'])
 
 if __name__ == '__main__':

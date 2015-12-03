@@ -16,7 +16,8 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     # TODO: put package requirements here
-    'docopt'
+    'docopt',
+    'gitpython'
 ]
 
 test_requirements = [
@@ -59,6 +60,7 @@ setup(
             'pygrade = pygrade.pygrade:main',
             'pygrade-grade = pygrade.grade:main',
             'pygrade-cheat = pygrade.cheat:main',
+            'pygrade-push = pygrade.push:main',
         ],
     },
     test_suite='tests',

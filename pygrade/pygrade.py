@@ -17,7 +17,7 @@ from docopt import docopt
 from . import __version__
 
 
-CMDS = ['grade', 'cheat']
+CMDS = ['cheat', 'grade', 'push']
 
 
 def clone(repo):

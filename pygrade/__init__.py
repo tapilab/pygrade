@@ -4,12 +4,27 @@ __author__ = 'Aron Culotta'
 __email__ = 'aronwc@gmail.com'
 __version__ = '0.1.0'
 
+import csv
 import errno
 import git
 import os
 import re
 import time
 import traceback
+
+def check_students(students):
+    """ Make sure we have requisite fields for each student."""
+    for s in students:
+        if 'github_repo' not in s:
+            print('missing github_repo for %s' % str(s))
+
+
+def read_students(path):
+    """ Read a tab-separated file of students. The only required field is 'github_repo', which is this
+    student's github repository. """
+    students = [line for line in csv.DictReader(open(path), delimiter='\t')]
+    check_students(students)
+    return students
 
 
 def path2name(path):
