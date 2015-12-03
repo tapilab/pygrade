@@ -5,8 +5,8 @@ pygrade
 .. image:: https://img.shields.io/pypi/v/pygrade.svg
         :target: https://pypi.python.org/pypi/pygrade
 
-.. image:: https://img.shields.io/travis/aronwc/pygrade.svg
-        :target: https://travis-ci.org/aronwc/pygrade
+.. image:: https://img.shields.io/travis/tapilab/pygrade.svg
+        :target: https://travis-ci.org/tapilab/pygrade
 
 .. image:: https://readthedocs.org/projects/pygrade/badge/?version=latest
         :target: https://readthedocs.org/projects/pygrade/?badge=latest
