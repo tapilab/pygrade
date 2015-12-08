@@ -19,7 +19,7 @@ requirements = [
     'docopt',
     'gitpython',
     'nose',
-    'sklearn',
+    'scikit-learn',
     'numpy',
 ]
 
