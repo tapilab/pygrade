@@ -5,8 +5,9 @@ usage:
     pygrade [--help] <command> [<args>...]
 
 The most commonly used pygrade commands are:
-     grade      Grade assignments
-     cheat      Detect plagiarism
+     cheat      Detect plagiarism.
+     grade      Grade assignments.
+     push       Push grades to student repositories.
 
 See 'pygrade help <command>' for more information on a specific command.
 
