@@ -18,7 +18,8 @@ requirements = [
     # TODO: put package requirements here
     'docopt',
     'gitpython',
-    'nose'
+    'nose',
+    'sklearn',
 ]
 
 test_requirements = [
