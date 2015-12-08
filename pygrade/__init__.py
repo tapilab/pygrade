@@ -12,6 +12,37 @@ import re
 import time
 import traceback
 
+
+def extract_metadata(text, result):
+    """
+    >>> extract_metadata('@name=a0/foo.py...', {})['file_to_test']
+    'a0/foo.py'
+    >>> extract_metadata('@possible_points=12.4', {})['possible_points']
+    12.4
+    """
+    match = re.search(r'\@name\s*=\s*(.+.py)', text)
+    if match:
+        result['file_to_test'] = match.group(1)
+    match = re.search(r'\@possible_points\s*=\s*([0-9\.]+)', text)
+    if match:
+        result['possible_points'] = float(match.group(1))
+    return result
+
+
+def read_assignment_metadata(test_file):
+    """
+    Extracts metadata in the comments of the unit test file. E.g.:
+    @name=a0/boolean_search.py
+    @possible_points=50
+    """
+    result = {'file_to_test': None,
+              'possible_points': None}
+
+    for line in open(test_file):
+        extract_metadata(line, result)
+    return result
+
+
 def check_students(students):
     """ Make sure we have requisite fields for each student. """
     for s in students:
