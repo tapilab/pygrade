@@ -21,12 +21,14 @@ requirements = [
     'nose',
     'scikit-learn',
     'numpy',
+    'wheel',
 ]
 
-test_requirements = [
-    # TODO: put package test requirements here
-    'nose'
-]
+test_requirements = requirements
+#[
+#    # TODO: put package test requirements here
+#    'nose'
+#]
 
 setup(
     name='pygrade',
