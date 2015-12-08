@@ -20,6 +20,7 @@ requirements = [
     'gitpython',
     'nose',
     'sklearn',
+    'numpy',
 ]
 
 test_requirements = [
