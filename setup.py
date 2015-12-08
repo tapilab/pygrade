@@ -19,8 +19,8 @@ requirements = [
     'docopt',
     'gitpython',
     'nose',
-    'scikit-learn',
     'numpy',
+    'scikit-learn',
     'wheel',
 ]
 
