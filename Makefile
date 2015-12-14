@@ -51,8 +51,7 @@ lint:
 test:
 	nosetests --with-doctest
 
-test-all:
-	tox
+test-all: test
 
 coverage:
 	coverage run --source pygrade setup.py test
