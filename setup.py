@@ -20,6 +20,7 @@ requirements = [
     'gitpython',
     'nose',
     'numpy',
+    'scipy',
     'scikit-learn',
     'wheel',
 ]
