@@ -3,13 +3,13 @@
 """Grade a Python assignment.
 
 usage:
-    pygrade grade --students <file> --test <file> [--output <file>] [--workdir <file>]
+    pygrade grade --test <file> [--students <file>] [--output <file>] [--workdir <file>]
 
 Options
     -h, --help
-    -s, --students <file>           Students JSON file
-    -t, --test <file>               File containing python tests for grading
     -o, --output <file>             Output file [default: grades.json]
+    -s, --students <file>           Students JSON file [default: students.tsv]
+    -t, --test <file>               File containing python tests for grading
     -w, --workdir <file>            Temporary directory for storing assignments [default: /tmp/pygrade]
 """
 import csv
@@ -19,6 +19,8 @@ import inspect
 import json
 import os
 import re
+import sys
+import traceback
 import time
 import unittest
 
@@ -75,9 +77,10 @@ def run_tests(students, test_path, path):
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
             assignment_module = import_file_as_module(assignment_path)
-        except Exception as e:  # Can't load the student's homework file.
+        except Exception as e:  # Compiler error or file not present.
+            exc_type, exc_value, exc_traceback = sys.exc_info()
             result['deductions'] = [{'summary': 'cannot import %s' % assignment_subpath,
-                                     'trace': str(e),
+                                     'trace': '\n'.join(traceback.format_exception_only(exc_type, exc_value)),
                                      'points': metadata['possible_points']}]
             result['grade'] = 0
             results.append(result)

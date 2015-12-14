@@ -3,12 +3,11 @@
 """Push grades to student repositories.
 
 usage:
-    pygrade push --grades <file> [--workdir <file>]
+    pygrade push [--grades <file>] [--workdir <file>]
 
 Options
     -h, --help
-    -s, --students <file>           Students JSON file
-    -g, --grades <file>             JSON grades output by the grade command
+    -g, --grades <file>             JSON grades output by the grade command [default: grades.json]
     -w, --workdir <file>            Temporary directory for storing assignments [default: /tmp/pygrade]
 """
 from docopt import docopt
@@ -43,7 +42,7 @@ def push_file(repo, grade, grade_path):
 
 def push_grades(grades, path):
     for g in grades:
-        print('grading %s for %s' % (g['assignment'], g['student']))
+        print('pushing grades for %s to %s' % (g['assignment'], g['student']['github_repo']))
         repo = get_local_repo(g['student'], path)
         asg_path = os.path.join(repo, re.sub(r'\/[^\/]+', '', g['assignment']))
         grade_path = os.path.join(asg_path, 'grade.txt')
