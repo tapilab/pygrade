@@ -3,13 +3,13 @@
 """Check for cheating.
 
 usage:
-    pygrade cheat --students <file> --test <file> [--output <file>] [--workdir <file>]
+    pygrade cheat --test <file> [--students <file>] [--output <file>] [--workdir <file>]
 
 Options
     -h, --help
-    -s, --students <file>           Students JSON file
+    -o, --output <file>             Output file [default: cheats.tsv]
+    -s, --students <file>           Students JSON file [default: students.tsv]
     -t, --test <file>               File containing python tests for grading
-    -o, --output <file>             Output file [default: cheats.txt]
     -w, --workdir <file>            Temporary directory for storing assignments [default: /tmp/pygrade]
 """
 import csv
@@ -74,9 +74,12 @@ def parse_assignments(students, test_path, path):
     for s in students:
         repo = get_local_repo(s, path)
         fname = os.path.join(repo, assignment_subpath)
-        src = '\n'.join(open(fname).readlines())
-        strings.append(strip_comments(src))
-        filenames.append(fname)
+        try:
+            src = '\n'.join(open(fname).readlines())
+            strings.append(strip_comments(src))
+            filenames.append(fname)
+        except FileNotFoundError as e:
+            pass
     print('read %d files' % len(strings))
     vec = TfidfVectorizer(token_pattern=r'(?u)\b\w+\b')
     X = vec.fit_transform(strings)
