@@ -10,7 +10,7 @@ Options
     -o, --output <file>             Output file [default: cheats.tsv]
     -s, --students <file>           Students JSON file [default: students.tsv]
     -t, --test <file>               File containing python tests for grading
-    -w, --workdir <file>            Temporary directory for storing assignments [default: /tmp/pygrade]
+    -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """
 import csv
 from docopt import docopt
@@ -103,11 +103,10 @@ def write_output(results, out_path):
 
 def main():
     args = docopt(__doc__)
-    path = mktmpdir(args['--workdir'])
+    path = args['--workdir']
     print('working directory=%s' % path)
     students = read_students(args['--students'])
     print('read %d students' % len(students))
-    clone_repos(students, path)
     results = compare_assignments(students, args['--test'], path)
     write_output(results, args['--output'])
 

@@ -6,6 +6,7 @@ usage:
 
 The most commonly used pygrade commands are:
      cheat      Detect plagiarism.
+     clone      Clone all student GitHub repositories.
      grade      Grade assignments.
      push       Push grades to student repositories.
 
@@ -18,17 +19,7 @@ from docopt import docopt
 from . import __version__
 
 
-CMDS = ['cheat', 'grade', 'push']
-
-
-def clone(repo):
-    pass
-
-def run_tests(repo, assignment_file, test_file):
-    pass
-
-def report_results():
-    pass
+CMDS = ['cheat', 'clone', 'grade', 'push']
 
 
 def main():

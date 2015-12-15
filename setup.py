@@ -64,8 +64,9 @@ setup(
     entry_points={
         'console_scripts': [
             'pygrade = pygrade.pygrade:main',
-            'pygrade-grade = pygrade.grade:main',
             'pygrade-cheat = pygrade.cheat:main',
+            'pygrade-clone = pygrade.clone:main',
+            'pygrade-grade = pygrade.grade:main',
             'pygrade-push = pygrade.push:main',
         ],
     },
