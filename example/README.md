@@ -24,6 +24,6 @@ You can shorten these commands using the default for filenames and directories (
 
 ```sh
 pygrade clone
-pygrade grade -t test_Assignment1.py
+pygrade grade -t test_assignment1.py
 pygrade push
 ```
