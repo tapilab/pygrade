@@ -33,7 +33,7 @@ test_requirements = requirements
 
 setup(
     name='pygrade',
-    version='0.1.0',
+    version='0.1.1',
     description="auto-grade python assignments",
     long_description=readme + '\n\n' + history,
     author="Aron Culotta",

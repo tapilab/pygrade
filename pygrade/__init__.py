@@ -2,7 +2,7 @@
 
 __author__ = 'Aron Culotta'
 __email__ = 'aronwc@gmail.com'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import csv
 import errno
