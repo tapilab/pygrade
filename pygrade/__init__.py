@@ -2,7 +2,7 @@
 
 __author__ = 'Aron Culotta'
 __email__ = 'aronwc@gmail.com'
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 import csv
 import errno
@@ -47,7 +47,7 @@ def check_students(students):
     """ Make sure we have requisite fields for each student. """
     for s in students:
         if 'github_repo' not in s:
-            print('missing github_repo for %s' % str(s))
+            print('  missing github_repo for %s' % str(s))
 
 
 def read_students(path):
@@ -71,13 +71,22 @@ def get_local_repo(s, path):
     return os.path.join(path, os.path.basename(s['github_repo']))
 
 
+def clone_repo(student, path):
+    try:
+        repo = student['github_repo']
+        topath = get_local_repo(student, path)
+        print('  cloning %s to %s ...' % (repo, topath))
+        git.repo.base.Repo.clone_from(repo + '.git', topath)
+        return True
+    except git.exc.GitCommandError as e:
+        print(e)
+        return False
+
+
 def clone_repos(students, path):
     """ Clone all student repos. """
     for s in students:
-        repo = s['github_repo']
-        topath = get_local_repo(s, path)
-        print('cloning %s to %s ...' % (repo, topath))
-        git.repo.base.Repo.clone_from(repo + '.git', topath)
+        clone_repo(s, path)
 
 
 def mktmpdir(subdir):

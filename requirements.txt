@@ -1,5 +1,6 @@
 docopt
 gitpython
 nose
+PyGithub
 scikit-learn
 wheel
