@@ -21,7 +21,7 @@ except:
     from urllib.request import urlopen
 
 
-GITHUB_REPO = 'aronwc/pygrade'
+GITHUB_REPO = 'tapilab/pygrade'
 TRAVIS_CONFIG_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), '.travis.yml')
 

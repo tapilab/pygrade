@@ -33,12 +33,12 @@ test_requirements = requirements
 
 setup(
     name='pygrade',
-    version='0.1.1',
+    version='0.1.2',
     description="auto-grade python assignments",
     long_description=readme + '\n\n' + history,
     author="Aron Culotta",
     author_email='aronwc@gmail.com',
-    url='https://github.com/aronwc/pygrade',
+    url='https://github.com/tapilab/pygrade',
     packages=[
         'pygrade',
     ],
