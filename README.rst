@@ -27,7 +27,9 @@ Features
 Related libraries
 -----------------
 
-* [teacherspet](https://github.com/education/teachers_pet): manipulates github repos for teaching.
+* teacherspet_ : manipulates github repos for teaching.
+
+.. _teacherspet: https://github.com/education/teachers_pet
 
 Credits
 ---------
