@@ -15,7 +15,7 @@ Options
 """
 from docopt import docopt
 from git import Repo
-from github import Github
+from github3 import login
 import os
 import traceback
 from . import clone_repo, get_local_repo, read_students
@@ -28,10 +28,10 @@ def lookup_team(existing_teams, name):
 
 
 def search_for_user(github, userid):
-    for r in github.search_users('%s in:login' % userid):
-        if r.login.lower() == userid.lower().strip():
-            return r
-    print('>>>cannot find github user with login %s. skipping...' % userid)
+    try:
+        return github.user(userid)
+    except:
+        print('>>>cannot find github user with login %s. skipping...' % userid)
     return None
 
 
@@ -41,7 +41,7 @@ def get_team(team_name, existing_teams, org, user):
         try:
             team = org.create_team(team_name, permission='push')
             print('  created new team %s' % team.name)
-            team.add_membership(user)
+            team.invite(user.login)
         except Exception as e:
             print(str(e))
             traceback.print_exc()
@@ -61,7 +61,7 @@ def get_repo(repo_name, existing_repos, org, team):
     repo = lookup_repo(existing_repos, repo_name)
     if not repo:
         try:
-            repo = org.create_repo(repo_name, team_id=team, private=True)
+            repo = org.create_repository(repo_name, team_id=team.id, private=True, auto_init=True)
             print('  created new repo %s' % repo.name)
         except Exception as e:
             print(str(e))
@@ -78,19 +78,18 @@ def add_to_org(user, org):
 
 def create_repos_and_teams(students, org_name, github, path):
     try:
-        org = [o for o in github.get_user().get_orgs() if os.path.basename(o.url) == org_name][0]
+        org = [o for o in github.me().organizations() if os.path.basename(o.url) == org_name][0]
         print('found org %s' % org.url)
     except Exception as e:
         print('>>>cannot find org named %s' % org_name)
         print(str(e))
         traceback.print_exc()
 
-    existing_teams = [t for t in org.get_teams()]
-    existing_repos = [r for r in org.get_repos()]
+    existing_teams = [t for t in org.teams()]
+    existing_repos = [r for r in org.repositories()]
     for s in students:
         print('initializing repo %s for %s' % (s['github_repo'], s['github_id']))
         user = search_for_user(github, s['github_id'])
-        # add_to_org(user, org)
         if not user:
             next
         team_name = os.path.basename(s['github_repo'])
@@ -109,7 +108,7 @@ def create_repos_and_teams(students, org_name, github, path):
 def write_readme(student, local_repo):
     reamde_file = os.path.join(local_repo, 'README.md')
     outf = open(reamde_file, 'wt')
-    outf.write('\n\n'.join('%s=%s' % (k, v) for k, v in student.items()))
+    outf.write('\n'.join('%s=%s  ' % (k, v) for k, v in student.items()))
     outf.close()
 
 
@@ -126,7 +125,7 @@ def main():
     args = docopt(__doc__)
     path = args['--workdir']
     students = read_students(args['--students'])
-    github = Github(args['--user'], args['--pass'])
+    github = login(args['--user'], args['--pass'])
     create_repos_and_teams(students, args['--org'], github, path)
 
 if __name__ == '__main__':
