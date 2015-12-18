@@ -19,7 +19,7 @@ from git import Repo
 from github3 import login
 import os
 import traceback
-from . import clone_repo, get_local_repo, read_students
+from . import clone_repo, get_local_repo, pull_repo, read_students
 
 
 def lookup_team(existing_teams, name):
@@ -101,6 +101,7 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
         local_repo = get_local_repo(s, path)
         if os.path.exists(local_repo):
             print('  repo already exists at %s' % local_repo)
+            pull_repo(local_repo)
         else:
             clone_repo(s, path)
         readme_path = write_readme(s, local_repo)

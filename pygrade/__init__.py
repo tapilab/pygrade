@@ -82,6 +82,14 @@ def clone_repo(student, path):
         print(e)
         return False
 
+def pull_repo(local_repo):
+    try:
+        repo = git.Repo(local_repo)
+        repo.remotes[0].pull()
+    except git.exc.GitCommandError as e:
+        print(e)
+        return False
+
 
 def clone_repos(students, path):
     """ Clone all student repos. """
