@@ -3,12 +3,13 @@
 """Initialize student repositories. Create one repo per student. Also create one team per student consisting of that student. Each repo is made private to that team.
 
 usage:
-    pygrade init --org <name> --user <username> --pass <passwd> [--students <file>] [--workdir <file>]
+    pygrade init --org <name> --user <username> --pass <passwd> --remote <uri> [--students <file>] [--workdir <file>]
 
 Options
     -h, --help
     -o, --org <string>          Name of the GitHub Organization for the course.
     -p, --pass <file>           GitHub password
+    -r, --remote <uri>          URL of remote github repo used for starter code.
     -s, --students <file>       Students JSON file [default: students.tsv]
     -u, --user <file>           GitHub username
     -w, --workdir <file>        Temporary directory for storing assignments [default: students]
@@ -76,7 +77,7 @@ def add_to_org(user, org):
     org.add_to_members(user, role='member')
 
 
-def create_repos_and_teams(students, org_name, github, path):
+def create_repos_and_teams(students, org_name, github, path, remote_repo):
     try:
         org = [o for o in github.me().organizations() if os.path.basename(o.url) == org_name][0]
         print('found org %s' % org.url)
@@ -98,12 +99,13 @@ def create_repos_and_teams(students, org_name, github, path):
             next
         repo = get_repo(team_name, existing_repos, org, team)
         local_repo = get_local_repo(s, path)
-        if clone_repo(s, path):
-            readme_path = write_readme(s, local_repo)
-            push_readme(local_repo)
+        if os.path.exists(local_repo):
+            print('  repo already exists at %s' % local_repo)
         else:
-            print('repo already exists in path %s' % local_repo)
-
+            clone_repo(s, path)
+        readme_path = write_readme(s, local_repo)
+        push_readme(local_repo)
+        add_remote(local_repo, remote_repo)
 
 def write_readme(student, local_repo):
     reamde_file = os.path.join(local_repo, 'README.md')
@@ -121,12 +123,23 @@ def push_readme(repo):
     print('  pushed README.md')
 
 
+def add_remote(local_repo, remote_repo):
+    repo_obj = Repo(local_repo)
+    try:
+        remote = repo_obj.create_remote('template', remote_repo)
+    except:  # remote already exists
+        pass
+    repo_obj.git.fetch('template')
+    repo_obj.git.merge('template/master')
+    repo_obj.remotes[0].push()
+    print('  pushed template from remote %s' % remote_repo)
+
 def main():
     args = docopt(__doc__)
     path = args['--workdir']
     students = read_students(args['--students'])
     github = login(args['--user'], args['--pass'])
-    create_repos_and_teams(students, args['--org'], github, path)
+    create_repos_and_teams(students, args['--org'], github, path, args['--remote'])
 
 if __name__ == '__main__':
     main()
