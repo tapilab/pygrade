@@ -68,7 +68,7 @@ def get_repo(repo_name, existing_repos, org, team):
             print(str(e))
             traceback.print_exc()
     else:
-        print('  found existing repo %s' % repo.name)
+        print('  found existing remote repo %s' % repo.name)
 
     return repo
 
@@ -100,7 +100,7 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
         repo = get_repo(team_name, existing_repos, org, team)
         local_repo = get_local_repo(s, path)
         if os.path.exists(local_repo):
-            print('  repo already exists at %s' % local_repo)
+            print('  found existing local repo at %s' % local_repo)
             pull_repo(local_repo)
         else:
             clone_repo(s, path)
