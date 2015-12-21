@@ -109,7 +109,7 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
         add_remote(local_repo, remote_repo)
 
 def write_readme(student, local_repo):
-    reamde_file = os.path.join(local_repo, 'README.md')
+    reamde_file = os.path.join(local_repo, 'Info.md')
     outf = open(reamde_file, 'wt')
     outf.write('\n'.join('%s=%s  ' % (k, v) for k, v in student.items()))
     outf.close()
@@ -118,10 +118,10 @@ def write_readme(student, local_repo):
 def push_readme(repo):
     repo_obj = Repo(repo)
     index = repo_obj.index
-    index.add(['README.md'])
-    index.commit('README')
+    index.add(['Info.md'])
+    index.commit('Info')
     repo_obj.remotes[0].push()
-    print('  pushed README.md')
+    print('  pushed Info.md')
 
 
 def add_remote(local_repo, remote_repo):
