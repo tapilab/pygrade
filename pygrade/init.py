@@ -62,7 +62,7 @@ def get_repo(repo_name, existing_repos, org, team):
     repo = lookup_repo(existing_repos, repo_name)
     if not repo:
         try:
-            repo = org.create_repository(repo_name, team_id=team.id, private=True, auto_init=True)
+            repo = org.create_repository(repo_name, team_id=team.id, private=True, auto_init=False)
             print('  created new repo %s' % repo.name)
         except Exception as e:
             print(str(e))

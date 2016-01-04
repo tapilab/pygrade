@@ -24,8 +24,7 @@ import traceback
 import time
 import unittest
 
-from . import clone_repos, extract_metadata, get_local_repo, path2name, mktmpdir, read_assignment_metadata, read_students
-
+from . import get_local_repo, path2name, pull_repo, read_assignment_metadata, read_students
 
 
 def import_file_as_module(path):
@@ -46,7 +45,7 @@ def _run_tests(test_path):
 def deduct_failures(test_results):
     """ Accumulate each failed tests and the points lost."""
     deductions = []
-    for failure in test_results.failures:
+    for failure in test_results.failures + test_results.errors:
         msg = failure[1]
         match = re.search(r'\@points\s*=\s*([0-9\.]+)', failure[0]._testMethodDoc)
         points = float(match.group(1)) if match else 0
@@ -74,6 +73,7 @@ def run_tests(students, test_path, path):
                   'time_graded': time.asctime(),
                   'possible_points': metadata['possible_points']}
         repo = get_local_repo(s, path)
+        pull_repo(repo)
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
             assignment_module = import_file_as_module(assignment_path)

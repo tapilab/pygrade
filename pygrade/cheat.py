@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Check for cheating.
+"""Check for cheating. Output file in format:
+similarity  file1  file2
 
 usage:
     pygrade cheat --test <file> [--students <file>] [--output <file>] [--workdir <file>]

@@ -8,6 +8,7 @@ The most commonly used pygrade commands are:
      cheat      Detect plagiarism.
      clone      Clone all student GitHub repositories.
      grade      Grade assignments.
+     init       Initialize repositories.
      push       Push grades to student repositories.
 
 See 'pygrade help <command>' for more information on a specific command.
