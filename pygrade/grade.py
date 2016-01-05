@@ -59,21 +59,8 @@ def deduct_failures(test_results):
     return deductions
 
 
-def run_tests(students, test_path, path):
-    """
-    Run unit tests and deduct points for each failed test.
-    Return a dictionary of results for each student.
-    FIXME: check for errors?
-    """
-    metadata = read_assignment_metadata(test_path)
-    assignment_subpath = metadata['file_to_test']
-    results = []
-    for s in students:
-        result = {'student': s, 'assignment': assignment_subpath,
-                  'time_graded': time.asctime(),
-                  'possible_points': metadata['possible_points']}
-        repo = get_local_repo(s, path)
-        pull_repo(repo)
+def load_assignment_modules(repo, assignment_subpaths, metadata, result, results):
+    for assignment_subpath in assignment_subpaths:
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
             assignment_module = import_file_as_module(assignment_path)
@@ -84,6 +71,27 @@ def run_tests(students, test_path, path):
                                      'points': metadata['possible_points']}]
             result['grade'] = 0
             results.append(result)
+            return False
+    return True
+
+
+def run_tests(students, test_path, path):
+    """
+    Run unit tests and deduct points for each failed test.
+    Return a dictionary of results for each student.
+    FIXME: check for errors?
+    """
+    metadata = read_assignment_metadata(test_path)
+    assignment_subpaths = metadata['files_to_test']
+    results = []
+    for s in students:
+        result = {'student': s, 'assignment': assignment_subpaths,
+                  'time_graded': time.asctime(),
+                  'possible_points': metadata['possible_points']}
+        repo = get_local_repo(s, path)
+        pull_repo(repo)
+        if not load_assignment_modules(repo, assignment_subpaths, metadata, result, results):
+            # Could not load an assignment file. Give 0 points and continue.
             continue
         test_results = _run_tests(test_path)
         result['deductions'] = deduct_failures(test_results)

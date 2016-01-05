@@ -15,14 +15,17 @@ import traceback
 
 def extract_metadata(text, result):
     """
-    >>> extract_metadata('@name=a0/foo.py...', {})['file_to_test']
-    'a0/foo.py'
+    >>> extract_metadata('@name=a0/foo.py', {})['files_to_test']
+    ['a0/foo.py']
+    >>> extract_metadata('@name=a0/foo.py,a0/bar.py', {})['files_to_test']
+    ['a0/foo.py', 'a0/bar.py']
     >>> extract_metadata('@possible_points=12.4', {})['possible_points']
     12.4
     """
-    match = re.search(r'\@name\s*=\s*(.+.py)', text)
+    match = re.search(r'\@name\s*=\s*(.+)', text)
     if match:
-        result['file_to_test'] = match.group(1)
+        filenames = match.group(1)
+        result['files_to_test'] = re.split('\s*,\s*', filenames)
     match = re.search(r'\@possible_points\s*=\s*([0-9\.]+)', text)
     if match:
         result['possible_points'] = float(match.group(1))
