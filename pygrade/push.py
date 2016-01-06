@@ -43,7 +43,7 @@ def push_file(repo, grade, grade_path):
 def push_grades(grades, path):
     for g in grades:
         repo = get_local_repo(g['student'], path)
-        asg_path = os.path.dirname(g['assignment'])
+        asg_path = os.path.dirname(g['assignment'][0])
         grade_path = os.path.join(repo, asg_path, 'grade.txt')
         write_grade_file(g, grade_path)
         print('pushing grade %s to %s' % (grade_path, g['student']['github_repo']))
