@@ -35,6 +35,7 @@ setup(
     packages=[
         'pygrade',
     ],
+    package_data={'pygrade': ['requirements.txt']},
     package_dir={'pygrade':
                  'pygrade'},
     include_package_data=True,
