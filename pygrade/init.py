@@ -85,6 +85,7 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
         print('>>>cannot find org named %s' % org_name)
         print(str(e))
         traceback.print_exc()
+        return
 
     existing_teams = [t for t in org.teams()]
     existing_repos = [r for r in org.repositories()]
@@ -92,21 +93,25 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
         print('initializing repo %s for %s' % (s['github_repo'], s['github_id']))
         user = search_for_user(github, s['github_id'])
         if not user:
-            next
+            continue
         team_name = os.path.basename(s['github_repo'])
         team = get_team(team_name, existing_teams, org, user)
         if not team:
-            next
+            continue
         repo = get_repo(team_name, existing_repos, org, team)
+        if not repo:
+            print('cannot getrepo for %s' % s['github_repo'])
+            continue
         local_repo = get_local_repo(s, path)
         if os.path.exists(local_repo):
             print('  found existing local repo at %s' % local_repo)
             pull_repo(local_repo)
         else:
             clone_repo(s, path)
-        readme_path = write_readme(s, local_repo)
+        write_readme(s, local_repo)
         push_readme(local_repo)
         add_remote(local_repo, remote_repo)
+
 
 def write_readme(student, local_repo):
     reamde_file = os.path.join(local_repo, 'Info.md')
@@ -127,13 +132,14 @@ def push_readme(repo):
 def add_remote(local_repo, remote_repo):
     repo_obj = Repo(local_repo)
     try:
-        remote = repo_obj.create_remote('template', remote_repo)
+        repo_obj.create_remote('template', remote_repo)
     except:  # remote already exists
         pass
     repo_obj.git.fetch('template')
     repo_obj.git.merge('template/master')
     repo_obj.remotes[0].push()
     print('  pushed template from remote %s' % remote_repo)
+
 
 def main():
     args = docopt(__doc__)

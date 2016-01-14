@@ -14,11 +14,8 @@ from docopt import docopt
 from git import Repo
 import json
 import os
-import re
-import time
-import unittest
 
-from . import clone_repos, get_local_repo, mktmpdir
+from . import get_local_repo
 
 
 def write_grade_file(grade, grade_path):
@@ -55,7 +52,6 @@ def main():
     path = args['--workdir']
     grades = [json.loads(s) for s in open(args['--grades'])]
     print('pushing %d grades' % (len(grades)))
-    students = [g['student'] for g in grades]
     push_grades(grades, path)
 
 

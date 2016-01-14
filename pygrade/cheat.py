@@ -13,18 +13,12 @@ Options
     -t, --test <file>               File containing python tests for grading
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """
-import csv
 from docopt import docopt
-import importlib
-import inspect
 from itertools import combinations
-import json
 import os
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import pairwise_distances
-import time
-import unittest
 
 from . import get_local_repo, read_assignment_metadata, read_students
 
@@ -32,7 +26,7 @@ from . import get_local_repo, read_assignment_metadata, read_students
 def strip_comments(src):
     src = re.sub(re.compile('\"\"\".+?\"\"\"', re.DOTALL), ' ', src)
     src = re.sub(re.compile(r"\'\'\'.+?\'\'\'", re.DOTALL), ' ', src)
-    src = re.sub(r'\#.+', ' ', src)
+    src = re.sub(r'#.+', ' ', src)
     src = re.sub(re.compile(r'\n[\n\s]+', re.MULTILINE), '\n', src)
     return src
 
@@ -40,7 +34,6 @@ def strip_comments(src):
 def parse_assignments(students, test_path, path):
     metadata = read_assignment_metadata(test_path)
     assignment_subpaths = metadata['files_to_test']
-    results = []
     strings = []
     filenames = []
     for s in students:

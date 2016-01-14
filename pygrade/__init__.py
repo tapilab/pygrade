@@ -10,7 +10,6 @@ import git
 import os
 import re
 import time
-import traceback
 
 
 def extract_metadata(text, result):
@@ -85,6 +84,7 @@ def clone_repo(student, path):
         print(e)
         return False
 
+
 def pull_repo(local_repo):
     try:
         repo = git.Repo(local_repo)
@@ -108,5 +108,6 @@ def mktmpdir(subdir):
     except OSError as e:
         if e.errno == errno.EEXIST and os.path.isdir(path):
             pass
-        else: raise
+        else:
+            raise
     return path

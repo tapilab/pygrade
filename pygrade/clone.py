@@ -11,12 +11,11 @@ Options
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """
 from docopt import docopt
-from . import clone_repos, mktmpdir, read_students
+from . import clone_repos, read_students
 
 
 def main():
     args = docopt(__doc__)
-    # path = mktmpdir(args['--workdir']) if args['--workdir'] == '/tmp/pygrade' else args['--workdir']
     path = args['--workdir']
     print('working directory=%s' % path)
     students = read_students(args['--students'])

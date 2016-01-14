@@ -12,7 +12,6 @@ Options
     -t, --test <file>               File containing python tests for grading
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """
-import csv
 from docopt import docopt
 import importlib
 import inspect
@@ -63,7 +62,7 @@ def load_assignment_modules(repo, assignment_subpaths, metadata, result, results
     for assignment_subpath in assignment_subpaths:
         assignment_path = os.path.join(repo, assignment_subpath)
         try:
-            assignment_module = import_file_as_module(assignment_path)
+            import_file_as_module(assignment_path)
         except Exception as e:  # Compiler error or file not present.
             exc_type, exc_value, exc_traceback = sys.exc_info()
             result['deductions'] = [{'summary': 'cannot import %s' % assignment_subpath,
@@ -99,12 +98,14 @@ def run_tests(students, test_path, path):
         results.append(result)
     return results
 
+
 def write_grades(grades, out_path):
     outf = open(out_path, 'w')
     for g in grades:
         outf.write(json.dumps(g) + '\n')
     outf.close()
     print('saved results in %s' % out_path)
+
 
 def main():
     args = docopt(__doc__)
