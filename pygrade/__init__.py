@@ -35,7 +35,7 @@ def extract_metadata(text, result):
 def read_assignment_metadata(test_file):
     """
     Extracts metadata in the comments of the unit test file. E.g.:
-    @name=a0/boolean_search.py
+    @name=a0/boolean_search.py,a0/run.py
     @possible_points=50
     """
     result = {'file_to_test': None,
