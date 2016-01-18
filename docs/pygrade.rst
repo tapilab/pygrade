@@ -28,6 +28,14 @@ pygrade.grade module
     :undoc-members:
     :show-inheritance:
 
+pygrade.init module
+-------------------
+
+.. automodule:: pygrade.init
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pygrade.push module
 -------------------
 
