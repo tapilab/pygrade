@@ -30,7 +30,7 @@ Features include the ability to:
 
 See the example_ for a tutorial on usage.
 
-.. _example: example/
+.. _example: https://github.com/tapilab/pygrade/tree/master/example
 
 Related libraries
 -----------------
