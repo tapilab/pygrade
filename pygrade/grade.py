@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Grade a Python assignment.
+"""Grade a Python assignment, writing results to a .json file.
 
 usage:
     pygrade grade --test <file> [--students <file>] [--output <file>] [--workdir <file>]
@@ -8,7 +8,7 @@ usage:
 Options
     -h, --help
     -o, --output <file>             Output file [default: grades.json]
-    -s, --students <file>           Students JSON file [default: students.tsv]
+    -s, --students <file>           Students TSV file [default: students.tsv]
     -t, --test <file>               File containing python tests for grading
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """

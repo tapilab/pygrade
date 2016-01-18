@@ -10,7 +10,7 @@ Options
     -o, --org <string>          Name of the GitHub Organization for the course.
     -p, --pass <file>           GitHub password
     -r, --remote <uri>          URL of remote github repo used for starter code.
-    -s, --students <file>       Students JSON file [default: students.tsv]
+    -s, --students <file>       Students TSV file [default: students.tsv]
     -u, --user <file>           GitHub username
     -w, --workdir <file>        Temporary directory for storing assignments [default: students]
 """

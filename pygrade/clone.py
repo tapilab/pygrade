@@ -7,7 +7,7 @@ usage:
 
 Options
     -h, --help
-    -s, --students <file>           Students JSON file [default: students.tsv]
+    -s, --students <file>           Students TSV file [default: students.tsv]
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """
 from docopt import docopt
