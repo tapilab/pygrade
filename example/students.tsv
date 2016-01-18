@@ -1,2 +1,2 @@
-github_repo	name	id
-https://github.com/tapilab/pygrade	Test Student	1234567
+github_repo	github_id	Name	Student ID
+https://github.com/tapilab/pygrade-example-student	aronwc	Test Student	1234567
