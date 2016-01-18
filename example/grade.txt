@@ -1,18 +1,32 @@
-Grade: 4.00/5.00
+Grade: 8.00/20.00
 
-1 Deduction(s):
+2 Deduction(s):
 
 --------------
-#1: 1.00 points
-Failing test: test_hard:  @points=1 
+#1: 10.00 points
+Failing test: test_add:  @points=10 
 Traceback (most recent call last):
-  File "test_assignment1.py", line 31, in test_hard
+  File "test_asg0.py", line 39, in test_add
+    self.assertEqual(add(2, 2), 4)
+AssertionError: 0 != 4
+
+source:
+    def test_add(self):
+         """ @points=10 """
+         self.assertEqual(add(2, 2), 4)
+--------------
+
+--------------
+#2: 2.00 points
+Failing test: test_hard:  @points=2 
+Traceback (most recent call last):
+  File "test_asg0.py", line 35, in test_hard
     self.assertTrue(is_mammal('dolphin'))
 AssertionError: False is not true
 
 source:
     def test_hard(self):
-         """ @points=1 """
+         """ @points=2 """
          self.assertTrue(is_mammal('dolphin'))
 --------------
 
