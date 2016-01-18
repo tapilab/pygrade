@@ -9,7 +9,7 @@ total for this assignment. Multiple files can be listed, separated by commas.
 @possible_points=20
 """
 import unittest
-from assignment1 import *
+from asg0 import *
 
 
 class TestAssignment1(unittest.TestCase):
