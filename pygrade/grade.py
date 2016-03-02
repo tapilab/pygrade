@@ -3,11 +3,12 @@
 """Grade a Python assignment, writing results to a .json file.
 
 usage:
-    pygrade grade --test <file> [--students <file>] [--output <file>] [--workdir <file>]
+    pygrade grade --test <file> [--students <file>] [--output <file>] [--workdir <file>] [--pull]
 
 Options
     -h, --help
     -o, --output <file>             Output file [default: grades.json]
+    -p, --pull                      Pull latest code from student repository.
     -s, --students <file>           Students TSV file [default: students.tsv]
     -t, --test <file>               File containing python tests for grading
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
@@ -74,7 +75,7 @@ def load_assignment_modules(repo, assignment_subpaths, metadata, result, results
     return True
 
 
-def run_tests(students, test_path, path):
+def run_tests(students, test_path, path, do_pull):
     """
     Run unit tests and deduct points for each failed test.
     Return a dictionary of results for each student.
@@ -84,11 +85,14 @@ def run_tests(students, test_path, path):
     assignment_subpaths = metadata['files_to_test']
     results = []
     for s in students:
+        print('grading %s' % str(s))
         result = {'student': s, 'assignment': assignment_subpaths,
                   'time_graded': time.asctime(),
                   'possible_points': metadata['possible_points']}
         repo = get_local_repo(s, path)
-        pull_repo(repo)
+        if do_pull:
+            print('pulling %s' % s['github_repo'])
+            pull_repo(repo)
         if not load_assignment_modules(repo, assignment_subpaths, metadata, result, results):
             # Could not load an assignment file. Give 0 points and continue.
             continue
@@ -109,11 +113,12 @@ def write_grades(grades, out_path):
 
 def main():
     args = docopt(__doc__)
+    print(args)
     path = args['--workdir']
     print('working directory=%s' % path)
     students = read_students(args['--students'])
     print('read %d students' % len(students))
-    results = run_tests(students, args['--test'], path)
+    results = run_tests(students, args['--test'], path, args['--pull'])
     write_grades(results, args['--output'])
 
 
