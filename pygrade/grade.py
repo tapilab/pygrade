@@ -75,6 +75,15 @@ def load_assignment_modules(repo, assignment_subpaths, metadata, result, results
     return True
 
 
+def unload_assignment_modules(repo, assignment_subpaths):
+    """ Unload assignment modules, so that another student's module doesn't stay loaded
+    when grading the next student. """
+    for assignment_subpath in assignment_subpaths:
+        assignment_path = os.path.join(repo, assignment_subpath)
+        del sys.modules[path2name(assignment_path)]
+    return True
+
+
 def run_tests(students, test_path, path, do_pull):
     """
     Run unit tests and deduct points for each failed test.
@@ -100,6 +109,7 @@ def run_tests(students, test_path, path, do_pull):
         result['deductions'] = deduct_failures(test_results)
         result['grade'] = max(0, metadata['possible_points'] - sum(d['points'] for d in result['deductions']))
         results.append(result)
+        unload_assignment_modules(repo, assignment_subpaths)
     return results
 
 
