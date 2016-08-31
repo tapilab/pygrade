@@ -18,6 +18,7 @@ from docopt import docopt
 from git import Repo
 from github3 import login
 import os
+import time
 import traceback
 from . import clone_repo, get_local_repo, pull_repo, read_students
 
@@ -40,6 +41,7 @@ def get_team(team_name, existing_teams, org, user):
     team = lookup_team(existing_teams, team_name)
     if not team:
         try:
+            print('creating team for %s' % team_name)
             team = org.create_team(team_name, permission='push')
             print('  created new team %s' % team.name)
             team.invite(user.login)
@@ -99,6 +101,7 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
         if not team:
             continue
         repo = get_repo(team_name, existing_repos, org, team)
+        time.sleep(1)
         if not repo:
             print('cannot getrepo for %s' % s['github_repo'])
             continue

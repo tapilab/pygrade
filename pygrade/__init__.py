@@ -50,6 +50,8 @@ def check_students(students):
     for s in students:
         if 'github_repo' not in s:
             print('  missing github_repo for %s' % str(s))
+        for k, v in s.items():
+            s[k] = v.strip() if v else None
 
 
 def read_students(path):
