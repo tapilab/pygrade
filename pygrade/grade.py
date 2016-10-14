@@ -95,6 +95,7 @@ def run_tests(students, test_path, path, do_pull):
     results = []
     for s in students:
         print('grading %s' % str(s))
+        sys.stdout.flush()
         result = {'student': s, 'assignment': assignment_subpaths,
                   'time_graded': time.asctime(),
                   'possible_points': metadata['possible_points']}
@@ -110,13 +111,16 @@ def run_tests(students, test_path, path, do_pull):
         result['grade'] = max(0, metadata['possible_points'] - sum(d['points'] for d in result['deductions']))
         results.append(result)
         unload_assignment_modules(repo, assignment_subpaths)
-    return results
+        yield result
+
+    #return results
 
 
 def write_grades(grades, out_path):
     outf = open(out_path, 'w')
     for g in grades:
         outf.write(json.dumps(g) + '\n')
+        outf.flush()
     outf.close()
     print('saved results in %s' % out_path)
 
