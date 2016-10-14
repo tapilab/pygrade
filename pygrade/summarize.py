@@ -31,7 +31,10 @@ def print_grade_distribution(grades):
 
 
 def clean_summary(s):
-    return s[:s.index(':')]
+    if s and ':' in s:
+        return s[:s.index(':')]
+    else:
+        return s.strip()
 
 
 def print_test_distribution(grades):
@@ -61,7 +64,7 @@ def summarize_errors(grades, test_names):
             test_name = clean_summary(d['summary'])
             if test_name in test_names:
                 trace = d['trace']
-                text = trace[:trace.index('source:')].strip()
+                text = trace[:trace.index('source:')].strip() if 'source:' in trace else trace.strip()
                 test2error_counts[test_name].update([text])
                 error2students[test_name + '__' + text].append(g['student']['github_id'])
     for test, error_counts in sorted(test2error_counts.items()):
