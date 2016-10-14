@@ -3,16 +3,18 @@
 """Grade a Python assignment, writing results to a .json file.
 
 usage:
-    pygrade grade --test <file> [--students <file>] [--output <file>] [--workdir <file>] [--pull]
+    pygrade grade --test <file> [--students <file>] [--output <file>] [--workdir <file>] [--pull] [--extra <file>]
 
 Options
     -h, --help
+    -e, --extra <file>              File containing extra deductions, in tab-separated format: github_id points_off reason
     -o, --output <file>             Output file [default: grades.json]
     -p, --pull                      Pull latest code from student repository.
     -s, --students <file>           Students TSV file [default: students.tsv]
     -t, --test <file>               File containing python tests for grading
     -w, --workdir <file>            Temporary directory for storing assignments [default: students]
 """
+from collections import defaultdict
 from docopt import docopt
 import importlib
 import inspect
@@ -84,7 +86,7 @@ def unload_assignment_modules(repo, assignment_subpaths):
     return True
 
 
-def run_tests(students, test_path, path, do_pull):
+def run_tests(students, test_path, path, do_pull, student2extra):
     """
     Run unit tests and deduct points for each failed test.
     Return a dictionary of results for each student.
@@ -107,7 +109,7 @@ def run_tests(students, test_path, path, do_pull):
             # Could not load an assignment file. Give 0 points and continue.
             continue
         test_results = _run_tests(test_path)
-        result['deductions'] = deduct_failures(test_results)
+        result['deductions'] = deduct_failures(test_results) + student2extra[s['github_id']]
         result['grade'] = max(0, metadata['possible_points'] - sum(d['points'] for d in result['deductions']))
         results.append(result)
         unload_assignment_modules(repo, assignment_subpaths)
@@ -125,14 +127,31 @@ def write_grades(grades, out_path):
     print('saved results in %s' % out_path)
 
 
+def read_extra_deductions(args):
+    """
+    Read a file containing additional deductions for a student. E.g.  for late
+    points; or if there is a small compiler error that the grader fixes in
+    order to run the rest of the tests.
+    """
+    student2extra = defaultdict(lambda: [])
+    if args['--extra']:
+        for line in open(args['--extra']):
+            parts = line.split('\t')
+            student2extra[parts[0]].append({'points': float(parts[1]),
+                                            'summary': parts[2],
+                                            'trace': ''})
+    return student2extra
+
+
 def main():
     args = docopt(__doc__)
     print(args)
     path = args['--workdir']
+    student2extra = read_extra_deductions(args)
     print('working directory=%s' % path)
     students = read_students(args['--students'])
     print('read %d students' % len(students))
-    results = run_tests(students, args['--test'], path, args['--pull'])
+    results = run_tests(students, args['--test'], path, args['--pull'], student2extra)
     write_grades(results, args['--output'])
 
 
