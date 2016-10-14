@@ -107,6 +107,7 @@ def run_tests(students, test_path, path, do_pull, student2extra):
             pull_repo(repo)
         if not load_assignment_modules(repo, assignment_subpaths, metadata, result, results):
             # Could not load an assignment file. Give 0 points and continue.
+            yield result
             continue
         test_results = _run_tests(test_path)
         result['deductions'] = deduct_failures(test_results) + student2extra[s['github_id']]
