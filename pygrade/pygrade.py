@@ -20,7 +20,7 @@ from docopt import docopt
 from . import __version__
 
 
-CMDS = ['cheat', 'clone', 'grade', 'init', 'push']
+CMDS = ['cheat', 'clone', 'grade', 'init', 'push', 'summarize']
 
 
 def main():

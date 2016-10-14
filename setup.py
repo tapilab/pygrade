@@ -63,6 +63,7 @@ setup(
             'pygrade-grade = pygrade.grade:main',
             'pygrade-init = pygrade.init:main',
             'pygrade-push = pygrade.push:main',
+            'pygrade-summarize = pygrade.summarize:main',
         ],
     },
     test_suite='tests',
