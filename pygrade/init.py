@@ -139,7 +139,7 @@ def add_remote(local_repo, remote_repo):
     except:  # remote already exists
         pass
     repo_obj.git.fetch('template')
-    repo_obj.git.merge('template/master')
+    repo_obj.git.merge('template/master', allow_unrelated_histories=True)
     repo_obj.remotes[0].push()
     print('  pushed template from remote %s' % remote_repo)
 
