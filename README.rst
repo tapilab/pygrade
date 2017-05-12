@@ -24,9 +24,9 @@ Features include the ability to:
 
 - Create private GitHub repositories for each student.
 - Populate student repositories with starter code.
-- Create student assignments by running unittests against their code.
-- Different point values can be assigned to each test
-- Grades and failing tests are pushed back to the student repositories.
+- Grade student assignments by running unittests against their code.
+- Push grades and failing tests back to the student repositories.
+- Summarize grades by test or student
 
 See the example_ for a tutorial on usage.
 
