@@ -3,14 +3,14 @@
 """Delete student repositories, teams, and accounts. 
 
 usage:
-    pygrade init --org <name> --user <username> --pass <passwd> --remote <uri> [--students <file>] [--workdir <file>]
+    pygrade delete --org <name> --user <username> --pass <passwd> [--students <file>]
 
 Options
     -h, --help
     -o, --org <string>          Name of the GitHub Organization for the course.
-    -p, --pass <file>           GitHub password
+    -p, --pass <str>           GitHub password
     -s, --students <file>       Students TSV file [default: students.tsv]
-    -u, --user <file>           GitHub username
+    -u, --user <str>           GitHub username
 """
 from docopt import docopt
 from git import Repo
@@ -26,7 +26,6 @@ def lookup_team(existing_teams, name):
         if t.name == name:
             return t
 
-
 def search_for_user(github, userid):
     try:
         return github.user(userid)
@@ -34,48 +33,10 @@ def search_for_user(github, userid):
         print('>>>cannot find github user with login %s. skipping...' % userid)
     return None
 
-
-def get_team(team_name, existing_teams, org, user):
-    team = lookup_team(existing_teams, team_name)
-    if not team:
-        try:
-            print('creating team for %s' % team_name)
-            team = org.create_team(team_name, permission='push')
-            print('  created new team %s' % team.name)
-            team.invite(user.login)
-        except Exception as e:
-            print(str(e))
-            traceback.print_exc()
-    else:
-        print('  found existing team %s' % team.name)
-
-    return team
-
-
 def lookup_repo(existing_repos, name):
     for t in existing_repos:
         if t.name == name:
             return t
-
-
-def get_repo(repo_name, existing_repos, org, team):
-    repo = lookup_repo(existing_repos, repo_name)
-    if not repo:
-        try:
-            repo = org.create_repository(repo_name, team_id=team.id, private=True, auto_init=False)
-            print('  created new repo %s' % repo.name)
-        except Exception as e:
-            print(str(e))
-            traceback.print_exc()
-    else:
-        print('  found existing remote repo %s' % repo.name)
-
-    return repo
-
-
-def add_to_org(user, org):
-    org.add_to_members(user, role='member')
-
 
 def delete_accounts(students, org_name, github,):
     try:
@@ -93,45 +54,29 @@ def delete_accounts(students, org_name, github,):
         print('deleting repo %s and account %s' % (s['github_repo'], s['github_id']))
         user = search_for_user(github, s['github_id'])
         if not user:
-            print('cannot find %s' % s['github_id'])
-            continue
+            print('>>>cannot find %s' % s['github_id'])
         team_name = os.path.basename(s['github_repo'])
-        team = get_team(team_name, existing_teams, org, user)
-        if not team:
-            print('cannot find %s' % s['github_id'])
-        repo = get_repo(team_name, existing_repos, org, team)
-        time.sleep(1)
+        repo = lookup_repo(existing_repos, team_name)
         if not repo:
-            print('cannot get repo for %s' % s['github_repo'])
-
-
-def write_readme(student, local_repo):
-    reamde_file = os.path.join(local_repo, 'Info.md')
-    outf = open(reamde_file, 'wt')
-    outf.write('\n'.join('%s=%s  ' % (k, v) for k, v in student.items()))
-    outf.close()
-
-
-def push_readme(repo):
-    repo_obj = Repo(repo)
-    index = repo_obj.index
-    index.add(['Info.md'])
-    index.commit('Info')
-    repo_obj.remotes[0].push()
-    print('  pushed Info.md')
-
-
-def add_remote(local_repo, remote_repo):
-    repo_obj = Repo(local_repo)
-    try:
-        repo_obj.create_remote('template', remote_repo)
-    except:  # remote already exists
-        pass
-    repo_obj.git.fetch('template')
-    repo_obj.git.merge('template/master', allow_unrelated_histories=True)
-    repo_obj.remotes[0].push()
-    print('  pushed template from remote %s' % remote_repo)
-
+            print('>>>cannot get repo for %s' % s['github_repo'])
+        else:
+            if repo.delete():
+                print('\trepo deleted')
+            else:
+                print('\t>>>repo deletion failed')
+        time.sleep(.5)
+        team = lookup_team(existing_teams, team_name)
+        if not team:
+            print('>>>cannot find %s' % s['github_id'])
+        else:
+            if team.delete():
+                print('\tteam deleted')
+            else:
+                print('\t>>>team deletion failed')
+        if org.remove_member(s['github_id']):
+            print('\tremoved from org')
+        else:
+            print('\t>>>remove from org failed')
 
 def main():
     args = docopt(__doc__)
