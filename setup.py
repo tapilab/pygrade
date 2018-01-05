@@ -60,6 +60,7 @@ setup(
             'pygrade = pygrade.pygrade:main',
             'pygrade-cheat = pygrade.cheat:main',
             'pygrade-clone = pygrade.clone:main',
+            'pygrade-delete = pygrade.delete:main',
             'pygrade-grade = pygrade.grade:main',
             'pygrade-init = pygrade.init:main',
             'pygrade-push = pygrade.push:main',

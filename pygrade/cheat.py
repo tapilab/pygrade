@@ -37,15 +37,21 @@ def parse_assignments(students, test_path, path):
     strings = []
     filenames = []
     for s in students:
+        this_string = ''
         repo = get_local_repo(s, path)
         for assignment_subpath in assignment_subpaths:
+
             fname = os.path.join(repo, assignment_subpath)
             try:
                 src = '\n'.join(open(fname).readlines())
-                strings.append(strip_comments(src))
-                filenames.append(fname)
+                #strings.append(strip_comments(src))
+                #filenames.append(fname)
+                this_string += strip_comments(src)
             except FileNotFoundError as e:
+                print('FileNotFound' + str(e))
                 pass
+        strings.append(this_string)
+        filenames.append(repo)
     print('read %d files' % len(strings))
     vec = TfidfVectorizer(token_pattern=r'(?u)\b\w+\b')
     X = vec.fit_transform(strings)

@@ -37,7 +37,7 @@ def read_assignment_metadata(test_file):
     @name=a0/boolean_search.py,a0/run.py
     @possible_points=50
     """
-    result = {'file_to_test': None,
+    result = {'files_to_test': None,
               'possible_points': None}
 
     for line in open(test_file):
