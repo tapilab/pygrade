@@ -77,12 +77,13 @@ def load_assignment_modules(repo, assignment_subpaths, metadata, result, results
     return True
 
 
-def unload_assignment_modules(repo, assignment_subpaths):
+def unload_assignment_modules(repo, assignment_subpaths, test_path):
     """ Unload assignment modules, so that another student's module doesn't stay loaded
     when grading the next student. """
     for assignment_subpath in assignment_subpaths:
         assignment_path = os.path.join(repo, assignment_subpath)
         del sys.modules[path2name(assignment_path)]
+    del sys.modules[path2name(test_path)]
     return True
 
 
@@ -113,7 +114,7 @@ def run_tests(students, test_path, path, do_pull, student2extra):
         result['deductions'] = deduct_failures(test_results) + student2extra[s['github_id']]
         result['grade'] = max(0, metadata['possible_points'] - sum(d['points'] for d in result['deductions']))
         results.append(result)
-        unload_assignment_modules(repo, assignment_subpaths)
+        unload_assignment_modules(repo, assignment_subpaths, test_path)
         yield result
 
     #return results
