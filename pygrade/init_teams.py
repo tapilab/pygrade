@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Initialize student repositories. Create one repo per student. Also create one team per student consisting of that student. Each repo is made private to that team.
+"""Initialize student project repositories. Create one repo per team. Each repo is made private to that team.
 
 usage:
-    pygrade init --org <name> --user <username> --pass <passwd> --remote <uri> [--students <file>] [--workdir <file>]
+    pygrade init-team --org <name> --user <username> --pass <passwd> --remote <uri> --teams <file> [--students <file>] [--workdir <file>]
 
 Options
     -h, --help
@@ -11,6 +11,7 @@ Options
     -p, --pass <file>           GitHub password
     -r, --remote <uri>          URL of remote github repo used for starter code.
     -s, --students <file>       Students TSV file [default: students.tsv]
+    -t, --teams <file>          Teams TSV file. Each line has list of github IDs for team. [default: teams.tsv]
     -u, --user <file>           GitHub username
     -w, --workdir <file>        Temporary directory for storing assignments [default: students]
 """
@@ -78,17 +79,6 @@ def get_repo(repo_name, existing_repos, org, team):
 def add_to_org(user, org):
     org.add_to_members(user, role='member')
 
-def mkdir(subdir):
-    """ Make a unique directory for student repos. """
-    path = '%s-%d' % (subdir, time.time())
-    try:
-        os.makedirs(path)
-    except OSError as e:
-        if e.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
-    return path
 
 def create_repos_and_teams(students, org_name, github, path, remote_repo):
     try:
@@ -121,7 +111,6 @@ def create_repos_and_teams(students, org_name, github, path, remote_repo):
             print('  found existing local repo at %s' % local_repo)
             pull_repo(local_repo)
         else:
-            mkdir(local_repo)
             clone_repo(s, path)
         write_readme(s, local_repo)
         push_readme(local_repo)
